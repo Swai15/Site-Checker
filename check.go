@@ -23,7 +23,7 @@ func Check(destination string, port string) string {
 
 		resp, err := http.Get("http://" + destination)
 		if err != nil {
-			status += fmt.Sprintf(", bu unable to retrieve status code: %v", err)
+			status += fmt.Sprintf(", but unable to retrieve status code: %v", err)
 		} else {
 			defer resp.Body.Close()
 			statusCode := resp.StatusCode
