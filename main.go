@@ -7,8 +7,12 @@ import (
 
 	"github.com/urfave/cli/v2"
 )
+var trackedWebsites []string
+var dataFileName = "tracked_websites.json"
 
 func main() {
+
+
   app := &cli.App{
     Name:  "HealthChecker",
     Usage: "A tool for checking and managing website health",
@@ -17,7 +21,7 @@ func main() {
         Name:     "domain",
         Aliases: []string{"d"},
         Usage:    "Domain name to check",
-        Required: true,
+        // Required: true,
       },
       &cli.StringFlag{
         Name:     "port",
@@ -29,8 +33,9 @@ func main() {
         Name:     "add",
         Aliases: []string{"a"},
         Usage:    "Add a website to track its health",
+				// Required: true,
       },
-      &cli.StringFlag{
+      &cli.BoolFlag{
         Name:     "list",
         Aliases: []string{"l"},
         Usage:    "List tracked websites",
@@ -42,19 +47,23 @@ func main() {
       },
     },
     Action: func(c *cli.Context) error {
+
       domain := c.String("domain")
       port := c.String("port")
 
       if c.String("add") != "" {
         // Add site
+				Add(domain)
         fmt.Printf("Adding website: %s:%s\n", domain, port)
         return nil
-      } else if c.String("list") != "" {
+      } else if c.IsSet("list") {
         //list tracked websites
+				ListTrackedWebsites()
         fmt.Println("Listing tracked websites...")
         return nil
       } else if c.String("delete") != "" {
-        // delete website 
+        // delete website
+				Delete(domain)
         fmt.Printf("Deleting website: %s\n", domain)
         return nil
       } else {
@@ -71,3 +80,30 @@ func main() {
     log.Fatal(err)
   }
 }
+
+func Add(domain string) {
+	trackedWebsites = append(trackedWebsites, domain )
+	fmt.Println("Added website %s\n", domain)
+}
+
+func ListTrackedWebsites () {
+	fmt.Println("Tracked websites: ")
+	if len(trackedWebsites) == 0 {
+		fmt.Println("No websites are currently being tracked")
+	}
+	for _, website := range trackedWebsites {
+		fmt.Println(website)
+	}
+}
+
+func Delete (domainToDelete string) {
+	for i, website := range trackedWebsites {
+		if website == domainToDelete {		
+			trackedWebsites = append(trackedWebsites[:i], trackedWebsites[i+1:]... )
+			fmt.Printf("Deleted website %s\n", domainToDelete)
+			return
+		}
+	}
+	fmt.Printf("Domain %s not found in tracked list of websites\n", domainToDelete)
+}
+
