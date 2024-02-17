@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 
 	"github.com/urfave/cli/v2"
 )
@@ -11,7 +13,10 @@ var trackedWebsites []string
 var dataFileName = "tracked_websites.json"
 
 func main() {
-
+	err := readTrackedWebsitesFromFile()
+	if err != nil {
+		log.Println("Error loading tracked websites: ", err)
+	}
 
   app := &cli.App{
     Name:  "HealthChecker",
@@ -53,8 +58,11 @@ func main() {
 
       if c.String("add") != "" {
         // Add site
-				Add(domain)
-        fmt.Printf("Adding website: %s:%s\n", domain, port)
+				err := Add(domain)
+				if err != nil {
+					return err
+				}
+        fmt.Printf("01 Adding website: %s \n", domain)
         return nil
       } else if c.IsSet("list") {
         //list tracked websites
@@ -75,15 +83,32 @@ func main() {
     },
   }
 
-  err := app.Run(os.Args)
+  err = app.Run(os.Args)
   if err != nil {
     log.Fatal(err)
   }
 }
 
-func Add(domain string) {
+func Add(domain string) error {
+	validDomain := regexp.MustCompile(`^([a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9](\.[a-zA-Z0-9-]{1,61})*)?$`)
+	if !validDomain.MatchString(domain) {
+		return fmt.Errorf("Invalid domain format %s", domain)
+	}
+
+	for _, existingWebsite := range trackedWebsites {
+		if existingWebsite == domain {
+			return fmt.Errorf("Website '%s' already exists", domain)
+		}
+	}
+
 	trackedWebsites = append(trackedWebsites, domain )
-	fmt.Println("Added website %s\n", domain)
+	err := writeTrackedWebsitesToFile()
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("Added website %s\n", domain)
+	return nil
 }
 
 func ListTrackedWebsites () {
@@ -94,16 +119,65 @@ func ListTrackedWebsites () {
 	for _, website := range trackedWebsites {
 		fmt.Println(website)
 	}
-}
+} 
 
 func Delete (domainToDelete string) {
 	for i, website := range trackedWebsites {
 		if website == domainToDelete {		
 			trackedWebsites = append(trackedWebsites[:i], trackedWebsites[i+1:]... )
 			fmt.Printf("Deleted website %s\n", domainToDelete)
+			err := writeTrackedWebsitesToFile()
+			 
+			if err != nil {
+				fmt.Println("Error deleting website: ", err)
+			}
+
 			return
 		}
 	}
 	fmt.Printf("Domain %s not found in tracked list of websites\n", domainToDelete)
 }
 
+func readTrackedWebsitesFromFile() error {
+	file, err := os.Open(dataFileName)
+	if err != nil {
+		if os.IsNotExist(err) {
+			trackedWebsites = []string{}
+			return nil
+		}
+		return err
+	}
+	defer file.Close()
+
+	decoder := json.NewDecoder(file)
+	err = decoder.Decode(&trackedWebsites)
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
+func writeTrackedWebsitesToFile() error {
+	file, err := os.Create(dataFileName)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// data, err := json.Marshal(trackedWebsites)
+	// if err != nil {
+	// 	return err
+	// }
+	encoder := json.NewEncoder(file)
+	err = encoder.Encode(trackedWebsites)
+	if err != nil {
+		return err
+	}
+
+	// _, err = file.Write(data)
+	// if err != nil {
+	// 	return err
+	// }
+	return nil
+}
