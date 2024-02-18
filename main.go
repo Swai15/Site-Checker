@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/urfave/cli/v2"
 )
@@ -53,6 +54,12 @@ func main() {
         Aliases: []string{"del"},
         Usage:    "Delete a tracked website",
       },
+      &cli.DurationFlag{
+        Name: "interval",
+        Aliases: []string{"i"},
+        Usage: "Set Interval for automatically checking tracked websites",
+        Value: 5 * time.Minute,
+      },
     },
     Action: func(c *cli.Context) error {
 
@@ -61,7 +68,7 @@ func main() {
       if c.IsSet("add") {
         // Add to tracked websites
 				addDomain := c.String("add")
-				err := Add(addDomain)
+				err :=  Add(addDomain)
 				if err != nil {
 					return err
 				}
@@ -82,7 +89,12 @@ func main() {
 					fmt.Printf("%s: %s\n", website, status)
 				}
 				return nil
-			} else {
+			} else if c.IsSet("interval") {
+       interval := c.Duration("interval") 
+       fmt.Printf("Starting periodic checking at %v intervals\n", interval)
+       go checkPeriodically(port, interval)
+       return nil
+      } else {
         // Perform check on single site
 				checkDomain := c.String("domain")
         status := check(checkDomain, port)
@@ -96,4 +108,18 @@ func main() {
   if err != nil {
     log.Fatal(err)
   }
+
+
 }
+
+func checkPeriodically(port string, interval time.Duration) {
+  for {
+		fmt.Println("Checking status of all tracked websites")
+    for _, website := range trackedWebsites {
+      status := check(website, port) 
+      fmt.Printf("%s: %s\n", website, status)
+    }
+    time.Sleep(interval)
+  }
+}
+
