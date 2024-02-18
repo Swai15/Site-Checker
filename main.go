@@ -53,30 +53,32 @@ func main() {
     },
     Action: func(c *cli.Context) error {
 
-      domain := c.String("domain")
       port := c.String("port")
 
-      if c.String("add") != "" {
-        // Add site
-				err := Add(domain)
+      if c.IsSet("add") {
+        // Add 
+				addDomain := c.String("add")
+        fmt.Printf("01 Adding website: %s \n", addDomain)
+
+				err := Add(addDomain)
 				if err != nil {
 					return err
 				}
-        fmt.Printf("01 Adding website: %s \n", domain)
+        fmt.Printf("01 Finished Adding website: %s \n", addDomain)
         return nil
       } else if c.IsSet("list") {
         //list tracked websites
 				ListTrackedWebsites()
-        fmt.Println("Listing tracked websites...")
         return nil
-      } else if c.String("delete") != "" {
+      } else if c.IsSet("delete"){
         // delete website
-				Delete(domain)
-        fmt.Printf("Deleting website: %s\n", domain)
+				deleteDomain := c.String("delete")
+				Delete(deleteDomain)
         return nil
       } else {
         // Perform health check
-        status := Check(domain, port)
+				checkDomain := c.String("domain")
+        status := Check(checkDomain, port)
         fmt.Println(status)
         return nil
       }
@@ -92,12 +94,12 @@ func main() {
 func Add(domain string) error {
 	validDomain := regexp.MustCompile(`^([a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9](\.[a-zA-Z0-9-]{1,61})*)?$`)
 	if !validDomain.MatchString(domain) {
-		return fmt.Errorf("Invalid domain format %s", domain)
+		return fmt.Errorf("invalid domain format %s", domain)
 	}
 
 	for _, existingWebsite := range trackedWebsites {
 		if existingWebsite == domain {
-			return fmt.Errorf("Website '%s' already exists", domain)
+			return fmt.Errorf("website '%s' already exists", domain)
 		}
 	}
 
@@ -125,7 +127,7 @@ func Delete (domainToDelete string) {
 	for i, website := range trackedWebsites {
 		if website == domainToDelete {		
 			trackedWebsites = append(trackedWebsites[:i], trackedWebsites[i+1:]... )
-			fmt.Printf("Deleted website %s\n", domainToDelete)
+			fmt.Printf("Deleted website '%s'\n", domainToDelete)
 			err := writeTrackedWebsitesToFile()
 			 
 			if err != nil {
@@ -165,19 +167,12 @@ func writeTrackedWebsitesToFile() error {
 	}
 	defer file.Close()
 
-	// data, err := json.Marshal(trackedWebsites)
-	// if err != nil {
-	// 	return err
-	// }
 	encoder := json.NewEncoder(file)
 	err = encoder.Encode(trackedWebsites)
 	if err != nil {
 		return err
 	}
 
-	// _, err = file.Write(data)
-	// if err != nil {
-	// 	return err
-	// }
 	return nil
 }
+
