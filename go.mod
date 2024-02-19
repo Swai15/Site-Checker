@@ -1,4 +1,4 @@
-module github.com/Swai15/go-healthcheck
+module github.com/Swai15/Site-Checker
 
 go 1.21.6
 

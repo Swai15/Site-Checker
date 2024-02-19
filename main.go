@@ -18,7 +18,7 @@ func main() {
 	}
 
   app := &cli.App{
-    Name:  "HealthChecker",
+    Name:  "sitechecker",
     Usage: "A tool for checking and managing website health",
     Flags: []cli.Flag{
       &cli.StringFlag{
