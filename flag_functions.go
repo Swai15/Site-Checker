@@ -32,11 +32,9 @@ func check(destination string, port string) string {
 			}
 
 		}
-
 	}
 	return status
 }
-
 
 func Add(domain string) error {
 	validDomain := regexp.MustCompile(`^([a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9](\.[a-zA-Z0-9-]{1,61})*)?$`)
@@ -85,4 +83,30 @@ func Delete (domainToDelete string) {
 		}
 	}
 	fmt.Printf("Domain %s not found in tracked list of websites\n", domainToDelete)
+}
+
+func checkPeriodically(port string, interval time.Duration) {
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+  initialCheck(port)
+
+	for{
+		select {
+		case <-ticker.C:
+			fmt.Println("Checking status of all tracked websites...")
+			for _, website := range trackedWebsites {
+				status := check(website, port)
+				fmt.Printf("%s: %s\n", website, status)
+			}
+		}
+	}
+}
+
+// first check before interval begins on periodic checks
+func initialCheck(port string) {
+  	fmt.Println("Checking status of all tracked websites...")
+	for _, website := range trackedWebsites {
+		status := check(website, port)
+		fmt.Printf("%s: %s\n", website, status)
+	}
 }

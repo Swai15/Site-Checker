@@ -93,7 +93,8 @@ func main() {
        interval := c.Duration("interval") 
        fmt.Printf("Starting periodic checking at %v intervals\n", interval)
        go checkPeriodically(port, interval)
-       return nil
+       select{}
+      //  return nil
       } else {
         // Perform check on single site
 				checkDomain := c.String("domain")
@@ -112,14 +113,4 @@ func main() {
 
 }
 
-func checkPeriodically(port string, interval time.Duration) {
-  for {
-		fmt.Println("Checking status of all tracked websites")
-    for _, website := range trackedWebsites {
-      status := check(website, port) 
-      fmt.Printf("%s: %s\n", website, status)
-    }
-    time.Sleep(interval)
-  }
-}
 
