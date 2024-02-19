@@ -1,16 +1,15 @@
-# HealthChecker CLI Tool
+# sitechecker CLI Tool
 
 SiteChecker is a command-line tool that allows you to monitor the availability and status of websites.
 
 ## Features
 
-- **Single Website Check**: Check the status of a single website.
-- **Check All Tracked Websites**: Check the status of all websites being tracked.
-- **Add Website**: Add a new website to be monitored.
-- **List Tracked Websites**: View a list of all currently tracked websites.
-- **Delete Website**: Remove a website from the list of tracked websites.
-- **Delete All Websites**: Clear the list of tracked websites.
-- **Periodic Checks**: Set intervals for automatic checks of all tracked websites.
+- Check the status of a single website.
+- Check the status of all websites being tracked.
+- Add a new website to be monitored.
+- View a list of all currently tracked websites.
+- Remove a single or all websites from list of tracked websites
+- Periodic intervals for automatic checks of all tracked websites.
 
 ## Usage
 
@@ -19,16 +18,16 @@ To use sitechecker, simply run the executable with appropriate flags. Here are s
 1. If you're in the project directory
 
 ```
-  go run . --flag value
+go run . --flag value
 
 ```
 
 2. Run it as a build.
 
 ```
-  go build -0 sitechecker
+go build -0 sitechecker
 
-  ./sitechecker --flag value
+./sitechecker --flag value
 
 ```
 
@@ -37,7 +36,7 @@ To use sitechecker, simply run the executable with appropriate flags. Here are s
 To install sitechecker, you need to have Go installed on your system. Then you can simply run:
 
 ```
-go get github.com/Swai15/Site-Checker
+go get github.com/Swai15/sitechecker
 
 ```
 
