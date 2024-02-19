@@ -68,7 +68,7 @@ func ListTrackedWebsites () {
 	}
 } 
 
-func Delete (domainToDelete string) {
+func delete (domainToDelete string) {
 	for i, website := range trackedWebsites {
 		if website == domainToDelete {		
 			trackedWebsites = append(trackedWebsites[:i], trackedWebsites[i+1:]... )
@@ -83,6 +83,21 @@ func Delete (domainToDelete string) {
 		}
 	}
 	fmt.Printf("Domain %s not found in tracked list of websites\n", domainToDelete)
+}
+
+func deleteAll() {
+	if len(trackedWebsites) == 0 {
+    fmt.Println("There aren't any domains in your tracked websites")
+		return
+	}
+
+	trackedWebsites = trackedWebsites[:0]
+		err := writeTrackedWebsitesToFile()
+		if err != nil {
+			fmt.Println("Error saving tracked websites: ", err)
+		} else {
+			fmt.Println("Deleted all tracked websites")
+		}
 }
 
 func checkPeriodically(port string, interval time.Duration) {

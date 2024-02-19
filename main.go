@@ -22,8 +22,8 @@ func main() {
     Usage: "A tool for checking and managing website health",
     Flags: []cli.Flag{
       &cli.StringFlag{
-        Name:     "domain",
-        Aliases: []string{"d"},
+        Name:     "check",
+        Aliases: []string{"c"},
         Usage:    "Domain name to check",
         // Required: true,
       },
@@ -54,6 +54,11 @@ func main() {
         Aliases: []string{"del"},
         Usage:    "Delete a tracked website",
       },
+      &cli.BoolFlag{
+        Name: "deleteAll",
+        Aliases: []string{},
+        Usage: "Delete all tracked websites",
+      },
       &cli.DurationFlag{
         Name: "interval",
         Aliases: []string{"i"},
@@ -80,7 +85,11 @@ func main() {
       } else if c.IsSet("delete"){
         // delete website
 				deleteDomain := c.String("delete")
-				Delete(deleteDomain)
+				delete(deleteDomain)
+        return nil
+      } else if c.IsSet("deleteAll") {
+        // delete all websites
+        deleteAll()
         return nil
       } else if c.IsSet("checkAll"){
 				fmt.Println("Checking status of all tracked websites")
@@ -97,7 +106,7 @@ func main() {
       //  return nil
       } else {
         // Perform check on single site
-				checkDomain := c.String("domain")
+				checkDomain := c.String("check")
         status := check(checkDomain, port)
         fmt.Println(status)
         return nil
