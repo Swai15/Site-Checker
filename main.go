@@ -62,7 +62,7 @@ func main() {
       &cli.DurationFlag{
         Name: "interval",
         Aliases: []string{"i"},
-        Usage: "Set Interval for automatically checking tracked websites",
+        Usage: "Set Interval for automatically checking tracked websites, e.g 5m, 20s",
         Value: 5 * time.Minute,
       },
     },

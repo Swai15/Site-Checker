@@ -4,12 +4,14 @@ SiteChecker is a command-line tool that allows you to monitor the availability a
 
 ## Features
 
-- Check the status of a single website.
+- Check the status of a single/ multiple tracked websites.
 - Check the status of all websites being tracked.
-- Add a new website to be monitored.
-- View a list of all currently tracked websites.
-- Remove a single or all websites from list of tracked websites
+- Add, list and delete a collection of monitored websites handled via a JSON file
 - Periodic intervals for automatic checks of all tracked websites.
+
+## Pending
+
+Notification system upon status change on a monitor mode for windows, linux and mac.
 
 ## Usage
 
@@ -40,4 +42,4 @@ go get github.com/Swai15/sitechecker
 
 ```
 
-This will install HealthChecker in your Go bin directory.
+This will install sitechecker in your Go bin directory.
